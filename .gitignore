@@ -1,0 +1,6 @@
+.giignore
+venv/
+__pycache__
+.vscode/
+
+
