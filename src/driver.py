@@ -1,52 +1,61 @@
-# driver.py
-
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.action_chains import ActionChains
 import time
-import logging
 
+URL = "https://www.linkedin.com/jobs/search/?currentJobId=4325643765&geoId=105015875&origin=JOBS_HOME_LOCATION_HISTORY"
+keyword_search_box_ID = "jobs-search-box-keyword-id-ember99" 
+country_search_box_ID = "jobs-search-box-location-id-ember99"
 
-def verify_you_are_human(driver):
-    #when called this function must be wrapped into a try-except TimeoutExeption block
-        WebDriverWait(driver, timeout=300).until(EC.frame_to_be_available_and_switch_to_it('iframe_name_or_id'))
-
-        btn = driver.find_element(By.XPATH, '//*[@id="GjRM0"]/div/label/input')
-
-        action = ActionChains(driver)
-        action.click_and_hold(btn)
-
-        action.perform()
-
-        time.sleep(10)
-
-        action.release(btn)
-
-
-def click_verification(driver):
-    checkboxes = driver.find_element(By.CSS_SELECTOR, "input[type='checkbox']")
-    target_checkbox = checkboxes[1] 
-    target_checkbox.click()
+class driver():
+    def __init__(self):
+        self.driver = webdriver.Chrome()
     
-def click_search_button(driver):
-    try:
-        span_element = driver.find_element(By.ID, "mySpan")
-        button_element = span_element.find_element(By.TAG_NAME, "button")
-        button_element.click()
-    except Exception as e:
-        logging.error(e)
+    def open_driver(self):
+        self.driver.get(URL)
+        
+    def tearDown(self):
+        self.driver.close()   
 
-    time.sleep(60*60)
-    return 0
+    def search_keyword(self, keyword):
+        keyword_search_box = self.driver.find_element(By.ID, keyword_search_box_ID)
+        self.driver.implicitly_wait(2)
+        keyword_search_box.clear()
+        keyword_search_box.send_keys(keyword)
+        keyword_search_box.send_keys(Keys.RETURN)
+
+    def search_country(self, country):
+        country_search_box = self.driver.find_element(By.ID, country_search_box_ID)
+        self.driver.implicitly_wait(2)
+        country_search_box.clear()
+        country_search_box.send_keys(country)
+        country_search_box.send_keys(Keys.RETURN)
+
+    def sing_in(self):
+        sign_in_button = self.driver.find_element(By.XPATH, "/html/body/div[1]/header/nav/div/a[1]")
+        sign_in_button.click()
     
-    
-if __name__ == "__main__":
+def main():
     driver = webdriver.Chrome()
-    driver.get("https://fr.indeed.com/")
-    verify_you_are_human(driver)
-    click_verification(driver)
+    driver.get(URL)
+    wait = WebDriverWait(driver, 10)
+    close_btn = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, ".modal__close, .close, button.close"))
+    )
+    close_btn.click()
+'''
+    wait.until(EC.invisibility_of_element_located(
+        (By.CSS_SELECTOR, "div.modal__overlay")
+    sign_in_button.click()
     
-    driver.quit()
+    sign_in_button = driver.find_element(By.XPATH, "/html/body/div[1]/header/nav/div/a[1]")
+    sign_in_button.click()
+    time.sleep(60*60)
+    ))
+'''
+
+if __name__ == "__main__":
+    main()
+    
